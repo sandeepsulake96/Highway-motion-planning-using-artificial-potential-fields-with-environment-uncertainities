@@ -60,11 +60,11 @@ surf(X,Y,u_r);
 %%    Obstacle 
 
 %testing static obstacle potential
-x_obs = 70;
-y_obs = 2;
+x_obs1 = 70;
+y_obs1 = 2;
 v=0;
 v_obs =5;
-u_car1 = k_obs*exp(- ((((X-x_obs).^2)./sx^2) + (((Y-y_obs).^2)./sy^2)) + gamma*((X-x_obs).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+u_car1 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2)) + gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
 
 
 
@@ -77,42 +77,51 @@ f = u_r+u_tar+u_car1;
 surf(X,Y,f)
 
 %% obstacle potential and animation
-% v_obs = 10;
-% dt= 0.1;
-% x_obs = 70;
-% y_obs = 2;
-% v=0;
-% while x_obs< 190
-% 
-%     x_obs= x_obs+v_obs*dt;
-%     y_obs = 2;
-%     u_car1 = k_obs*exp(- ((((X-x_obs).^2)./sx^2) + (((Y-y_obs).^2)./sy^2)) + gamma*((x-x_obs).^2./sx^2)*(k1*v+k2*(v-v_obs)));
-%     figure(1)
-%     surf(X,Y,u_car1+u_r+u_tar)
-% end
+v_obs = 10;
+dt= 0.1;
+x_obs1 = 70;
+y_obs1 = 2;
+
+x_obs2 = 100;
+y_obs2 = -2;
+
+v=0;
+while x_obs1< 190
+
+    x_obs1= x_obs1+v_obs*dt;
+    y_obs1 = 2;
+
+    
+    
+    u_car1 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2)) + gamma*((x-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+    u_car2 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)) + gamma*((x-x_obs2).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+
+    figure(1)
+    surf(X,Y,u_car1+u_r+u_tar)
+end
 
 
 %% Plan route
 start = [71,2];
 goal = [x_tar,y_tar];
 
-route = GradientBasedPlanner (f, start, goal, 80);
+route = GradientBasedPlanner (f, start, goal, 100);
 
 
 
 %% quiver plot
 
 [gx, gy] = gradient (-f);
-skip = 20;
+skip = 2;
 
 figure;
 
 xidx = 1:skip:200;
-yidx = 1:skip:nrows;
+yidx = 1:skip:81;
 
-quiver (x(yidx,xidx), y(yidx,xidx), gx(yidx,xidx), gy(yidx,xidx), 0.4);
+quiver (X(yidx,xidx), Y(yidx,xidx), gx(yidx,xidx), gy(yidx,xidx), 0.4);
 
-axis ([1 ncols 1 nrows]);
+axis ([1 200 1 30]);
 
 hold on;
 
@@ -121,6 +130,7 @@ pg = plot(goal(1), goal(2), 'g.', 'MarkerSize', 30);
 p3 = plot (route(:,1), route(:,2), 'r', 'LineWidth', 2);
 
 
+%%
 
 
 

@@ -1,5 +1,5 @@
 % road mesh
-x = 1:1:200;
+x = 1:1:400;
 y = -4:0.1:4;
 [X,Y] = meshgrid(x,y);
 %F = zeros*X;
@@ -22,7 +22,7 @@ gamma =0;
 
 
 % Target position (for target attraction)
-x_tar = 190;
+x_tar = 390;
 y_tar = 2;
 Y1=4.1;  %left boundary
 YC=0;   %center line
@@ -55,16 +55,16 @@ u_c =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 
 %total road potential
 u_r =u_e+u_c;
-surf(X,Y,u_r);
+surf(X,Y,u_r+u_tar);
 
 %%    Obstacle 
 
 %testing static obstacle potential
-x_obs = 70;
-y_obs = 2;
+x_obs1 = 70;
+y_obs1 = 2;
 v=0;
 v_obs =5;
-u_car1 = k_obs*exp(- ((((X-x_obs).^2)./sx^2) + (((Y-y_obs).^2)./sy^2)) + gamma*((X-x_obs).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+u_car1 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2)) + gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
 
 
 
@@ -74,22 +74,34 @@ f = u_r+u_tar+u_car1;
 
 
 %plotting total potential (obstacle + Road+ target)
-surf(X,Y,f)
+surf(X,Y,u_car1)
 
 %% obstacle potential and animation
-% v_obs = 10;
-% dt= 0.1;
-% x_obs = 70;
-% y_obs = 2;
-% v=0;
-% while x_obs< 190
+v_obs = 10;
+dt= 0.1;
+x_obs1 = 70;
+y_obs1 = 2;
+
+x_obs2 = 10;
+y_obs2 = -2;
+
+v=0;
+while x_obs1< x_tar
+
+    x_obs1= x_obs1+v_obs*dt;
+    %y_obs1 = 2;
+
+
+    x_obs2= x_obs2+v_obs*dt;
+    %y_obs2 = -2;
+    
+    u_car1 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2)) + gamma*((x-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+    u_car2 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)) + gamma*((x-x_obs2).^2./sx^2)*(k1*v+k2*(v-v_obs)));
 % 
-%     x_obs= x_obs+v_obs*dt;
-%     y_obs = 2;
-%     u_car1 = k_obs*exp(- ((((X-x_obs).^2)./sx^2) + (((Y-y_obs).^2)./sy^2)) + gamma*((x-x_obs).^2./sx^2)*(k1*v+k2*(v-v_obs)));
-%     figure(1)
-%     surf(X,Y,u_car1+u_r+u_tar)
-% end
+    figure(1)
+    surf(X,Y,u_car1+u_car2+u_r+u_tar)
+    view([60 -150])
+end
 
 
 %% Plan route
