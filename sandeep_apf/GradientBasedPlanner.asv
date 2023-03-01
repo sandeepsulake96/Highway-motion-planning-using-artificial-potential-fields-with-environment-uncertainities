@@ -11,12 +11,12 @@ function route = GradientBasedPlanner (f, start_coords, end_coords, max_its,x,y)
 % correspond to the coordinates of the robot as it moves along the route.
 % The first column corresponds to the x coordinate and the second to the y coordinate
 
-[gx, gy] = gradient (-f);
+[gx, gy] = gradient (f);
 
 route=start_coords;
 point_on_route=start_coords;
-speed = 1;
-tol = 1;
+speed = 0.1;
+tol = 0.1;
 
 
 %%% All of your code should be between the two lines of stars.
@@ -27,9 +27,9 @@ while(max_its >0)
         break;
     end
 
-%     t = (x == point_on_route(1)) & (y == point_on_route(2));
-%     indt = find(t);
-%     f_grad = [gx(indt) gy(indt)];
+    t = (x == point_on_route(1)) & (y == point_on_route(2));
+    indt = find(t);
+    f_grad = [fx(indt) fy(indt)]
 
 
     point_Vectorx = ones(size(x))*point_on_route(1);
@@ -46,12 +46,13 @@ while(max_its >0)
     delta_x = gx(y_closest_idx,x_closest_idx);
     delta_y = gy(y_closest_idx,x_closest_idx);
 
-  
+    %delta_x = gx(x_closest_idx,y_closest_idx);
+    %delta_y = gy(x_closest_idx,y_closest_idx);
 
     delta = [delta_x,delta_y];
-    %delta = [f_grad(1),f_grad(2)];
-    delta_direction_x = delta_x/norm(delta);
-    delta_direction_y = delta_y/norm(delta);
+
+    delta_direction_x = delta_x/norm(delta)
+    delta_direction_y = delta_y/norm(delta)
 
     new_route_x = point_on_route(1)-speed*delta_direction_x;
     new_route_y = point_on_route(2)-speed*delta_direction_y;
