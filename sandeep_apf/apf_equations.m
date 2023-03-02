@@ -22,7 +22,7 @@ k_edge2 =0.05;
 
 % Target position (for target attraction)
 x_tar = 390;
-y_tar = 4;
+y_tar = 2;
 Y1=8;  %left boundary
 YC=4;   %center line
 Y2=0;   % right boundary
@@ -41,20 +41,24 @@ f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 f3 = 1/200*( (X - x_tar).^2 + (Y- y_tar).^2 )
 
 %eq 4 (obstacle potential)
-x_obs1 = 200;
+x_obs1 = 100;
 y_obs1 = 6;
+
+x_obs2 = 250;
+y_obs2 = 2;
 v=0;
 v_obs =5;
 f4 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))) %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
 
+f5 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)))
 % total potential
-f=f1+f2+f3+0*f4;
+f=f1+f2+f3+f4+f5;
 
 
 %% Path Planning using gradient descent
 
 start = [10,5.5];
-goal = [390,2];
+goal = [x_tar,y_tar];
 iter = 500;
 route = grad_desc(start,goal,f,iter,3);
 
