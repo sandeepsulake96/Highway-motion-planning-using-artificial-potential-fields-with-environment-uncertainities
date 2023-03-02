@@ -5,15 +5,15 @@
 % %surf(X,Y,F)
 syms X Y;
 
-%%
+%
 k_tar = 10;
 k_b1 = 0.7;
 k_b2 = 0.7;
-k_c = 100;
+k_c = 25;
 si_c =1;
-k_obs= 15;
-sx=14;   %10
-sy= 0.7;   %1.4
+k_obs= 100;
+sx=40;   %10
+sy= 1.4;   %1.4
 k1= 0.005;
 k2=0.005;
 gamma =0;
@@ -27,7 +27,7 @@ Y1=8;  %left boundary
 YC=4;   %center line
 Y2=0;   % right boundary
 
-%% eq 1  (edge potential)
+% eq 1  (edge potential)
 d1 = (Y-Y1/2); d2= Y-Y2/2;
 u_edge1 = -k_edge1*(-exp(-d1)+1);
 u_edge2 = -k_edge2*(-exp(d2)+1);
@@ -36,18 +36,104 @@ f1 = u_edge1+u_edge2;
 % eq 2 (centerline potential)
 dc = Y-YC;
 f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
+
 %eq 3 (target potential)
-f3 = 1/100*( (X - x_tar).^2 + (Y- y_tar).^2 )
+f3 = 1/200*( (X - x_tar).^2 + (Y- y_tar).^2 )
 
-%
-f=f1+f2+f3;
+%eq 4 (obstacle potential)
+x_obs1 = 200;
+y_obs1 = 6;
+v=0;
+v_obs =5;
+f4 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))) %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
 
-%f = X - Y + 2*X^2 + 2*X*Y + Y^2;
-% Initial Guess:
+% total potential
+f=f1+f2+f3+0*f4;
+
+
+%% Path Planning using gradient descent
+
+start = [10,5.5];
+goal = [390,2];
+iter = 500;
+route = grad_desc(start,goal,f,iter,3);
+
+
+%% plotting
+x1 = 1:2:400;
+y1 = 0:0.5:8;
+[xx,yy]= meshgrid(x1,y1);
+
+fval = double((subs(f,{X,Y},{xx,yy})));
+route_height = double((subs(f,{X,Y},{route(:,1),route(:,2)})));
+
+figure(1)
+surf(xx,yy,fval);
+hold on
+plot3(route(:,1),route(:,2),route_height,'g','LineWidth',3)
+plot3(route(1,1),route(1,2),route_height(1),'r*','LineWidth',5)
+plot3(route(end,1),route(end,2),route_height(end),'r*','LineWidth',5)
+
+figure(2)
+contour(x1,y1,fval, 'Fill', 'On');
+hold on;
+plot(route(:,1),route(:,2),'linewidth',4,'Color','r');
+
+
 %%
-start = [10,3];
-goal = [x_tar,y_tar];
 
+
+
+
+
+
+
+
+
+
+
+
+%%
+route=start;
+point_on_route=start;
+
+% Gradient Computation:
+df_dx = diff(f, X);
+df_dy = diff(f, Y);
+J = [subs(df_dx,[X,Y], [point_on_route(1),point_on_route(2)]) subs(df_dy, [X,Y], [point_on_route(1),point_on_route(2)])]; % Gradient
+S = -(J); % Search Direction
+hx=1;
+hy=0.01;
+e=0.1;
+while norm(J) > e 
+%while(max_iter >0)
+
+    %I = [x(i),y(i)];
+    
+    %if (norm(goal-point_on_route)< dist_tol)
+       % break;
+    %end
+    
+%     syms h; % Step size
+%     g = subs(f, [X,Y], [x(i)+S(1)*h,y(i)+h*S(2)]);
+%     dg_dh = diff(g,h);
+%     h = solve(dg_dh, h); % Optimal Step Length
+    
+    new_route_x = point_on_route(1)+hx*S(1);
+    new_route_y = point_on_route(2)+hy*S(2);
+    
+    point_on_route = [new_route_x,new_route_y];
+    route = [route;point_on_route];
+    %max_iter = max_iter-1;
+
+    %x(i+1) = I(1)+h*S(1); % Updated x value
+    %y(i+1) = I(2)+0.01*S(2); % Updated y value
+    %i = i+1;
+    J = [subs(df_dx,[X,Y], [point_on_route(1),point_on_route(2)]) subs(df_dy, [X,Y], [point_on_route(1),point_on_route(2)])]; % Updated Gradient
+    S = -(J); % New Search Direction
+end
+
+%%
 x(1) = start(1);
 y(1) = start(2);
 
@@ -71,6 +157,7 @@ while norm(J) > e
     i = i+1;
     J = [subs(df_dx,[X,Y], [x(i),y(i)]) subs(df_dy, [X,Y], [x(i),y(i)])]; % Updated Gradient
     S = -(J); % New Search Direction
+    
 end
 %Result Table:
 % Iter = 1:i;
@@ -99,7 +186,7 @@ plot(x,y,'*-r');
 x1 = 1:2:400;
 y1 = 0:0.5:8;
 [xx,yy]= meshgrid(x1,y1);
-%surf(xx,yy,fval);
+surf(xx,yy,fval);
 
 fval= zeros(length(y1),length(x1));
 for i = 1:length(y1)
@@ -110,22 +197,8 @@ for i = 1:length(y1)
 end
 %%
 
-% contour(x1,y1,fval,'Fill','On')
-% hold on
-% 
 
 
- surf(xx,yy,fval);hold on;
- plot(x,y,'r-');
-
-
- 
- for i = 1:length(x) %216
-    for j = 1:length(y)
-        f_path(i,j) = vpa(subs(f,[X,Y],[x(i),y(j)]));
-         plot3(x(i),y(j),f_path(i,j),"-r",'LineWidth',8);hold on;
-    end
- end
 %%
 
 
