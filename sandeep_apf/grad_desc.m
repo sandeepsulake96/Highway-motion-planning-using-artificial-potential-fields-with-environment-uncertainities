@@ -11,8 +11,8 @@ df_dx = diff(f, X);
 df_dy = diff(f, Y);
 J = [subs(df_dx,[X,Y], [x(1),y(1)]) subs(df_dy, [X,Y], [x(1),y(1)])]; % Gradient
 S = -(J); % Search Direction
-hx=1;
-hy=0.01;
+hx=1.5;     %1
+hy=0.01;   %0.01
 %e=err_tol;
 
 %while norm(goal-point_on_route)> dist_tol
