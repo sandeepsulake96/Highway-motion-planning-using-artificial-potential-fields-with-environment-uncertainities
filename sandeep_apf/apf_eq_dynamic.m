@@ -10,7 +10,7 @@ syms X Y;
 k_tar = 10;
 k_b1 = 0.7;
 k_b2 = 0.7;
-k_c = 35;
+k_c = 35 ;
 si_c =1;
 k_obs= 100;
 sx=70;   %10
@@ -58,7 +58,7 @@ f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 f3= -4*(X-x_tar);
 
 
-start = [10,5.4];
+start = [10,2.5];
 final_route= start;
 goal = [x_tar,y_tar];
 x1 = 1:2:1000;
@@ -72,10 +72,10 @@ while final_route(end,1)< x_tar
     x_obs1(i+1)= x_obs1(i)+v_obs*dt; %only  longitudinal distance change
     x_obs2(i+1)= x_obs2(i)+v_obs*dt; %only  longitudinal distance change
     x_obs3(i+1)= x_obs3(i)+v_obs*dt; %only  longitudinal distance change
-
+    y_obs1(i+1)= y_obs1(i)-0.04*dt;
 
     %eq 4 (obstacle potential)
-    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1(i)).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
     f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)));
     f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3).^2)./sy^2)));
 
@@ -144,7 +144,7 @@ for i=1:length(x_obs1)
 
     plot(final_route(i,1),final_route(i,2),'b.','LineWidth', 2, 'MarkerSize', 20);
     hold on
-    h1=plot(x_obs1(i),y_obs1,'r.','LineWidth', 2, 'MarkerSize', 20);
+    h1=plot(x_obs1(i),y_obs1(i),'r.','LineWidth', 2, 'MarkerSize', 20);
     hold on
     h2= plot(x_obs2(i),y_obs2,'r.','LineWidth', 2, 'MarkerSize', 20);
     hold on
