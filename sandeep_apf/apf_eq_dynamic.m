@@ -13,7 +13,7 @@ k_b2 = 0.7;
 k_c = 35 ;
 si_c =1;
 k_obs= 100;
-sx=70;   %10
+sx=40;   %70
 sy= 1;   %1.4
 k1= 0.005;
 k2=0.005;
@@ -31,14 +31,14 @@ Y2=0;   % right boundary
 x_obs1 = 200;
 y_obs1 = 5.5;
 
-x_obs2 = 400;
+x_obs2 = 200;
 y_obs2 = 2.5;
 
 x_obs3 = 600;
 y_obs3 = 5.5;
 
 v=0;
-v_obs =1;
+v_obs =2;
 dt=1;
 
 
@@ -72,10 +72,10 @@ while final_route(end,1)< x_tar
     x_obs1(i+1)= x_obs1(i)+v_obs*dt; %only  longitudinal distance change
     x_obs2(i+1)= x_obs2(i)+v_obs*dt; %only  longitudinal distance change
     x_obs3(i+1)= x_obs3(i)+v_obs*dt; %only  longitudinal distance change
-    y_obs1(i+1)= y_obs1(i)-0.04*dt;
+    %y_obs1(i+1)= y_obs1(i)-0.04*dt;
 
     %eq 4 (obstacle potential)
-    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1(i)).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
     f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)));
     f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3).^2)./sy^2)));
 

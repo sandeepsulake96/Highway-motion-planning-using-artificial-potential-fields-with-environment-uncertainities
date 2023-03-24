@@ -23,9 +23,9 @@ k_edge2 =0.08;
 % Target position (for target attraction)
 x_tar = 950;
 y_tar = 5.5;
-Y1=8;  %left boundary
+Y1=8;   %left boundary
 YC=4;   %center line
-Y2=0;   % right boundary
+Y2=0;   %right boundary
 
 % eq 1  (edge potential)
 d1 = (Y-Y1/2); d2= Y-Y2/2;
@@ -101,8 +101,62 @@ plot(route(:,1),route(:,2),'linewidth',4,'Color','r');
 ylim([1,7]);
 set(gcf,'position',[x1(1),y1(1),1000,150])
 
-%%
+%% Calculate reference poses for vehicle tracking and control
+ 
+%thetaRef = zeros(length(route(:,1)),1);
 
+%gradbp = linspace(0,route(end))
+xRef2= route(:,1);
+yRef2= route(:,2);
+
+speed =10; %longitudinal speed
+
+L = 3; % bicycle length
+ld = 5; % lookahead distance
+Ts = 16; % simulation time
+
+sim('pure_pursuit_tracking.slx');
+% X_o = refPose(1,1); % initial vehicle position
+% Y_o = -refPose(1,2); % initial vehicle position 
+% psi_o = 0; % initial yaw angle
+
+
+figure(3)
+plot(xRef2,yRef2,'LineWidth',2)
+xlim([0 1000]);
+ylim([2 6]);
+hold on
+plot(x_track,y_track,'--g',LineWidth=2);
+
+%error plot
+
+y_track_interp = interp1(x_track,y_track,xRef2);
+
+figure(4)
+plot(xRef2,yRef2-y_track_interp,'LineWidth',2);
+xlabel('X')
+ylabel('Lateral Error')
+
+
+figure(5)
+plot(yaw,'LineWidth',2);
+xlabel('X')
+ylabel('Yaw[rad]')
+
+
+ %%
+% for i = 2:length(route(:,1))
+%     thetaRef(i,1) = atan2d((yRef2(i)-yRef2(i-1)),(xRef2(i)-xRef2(i-1)));
+% end
+% 
+% thetaRef(1) = thetaRef(2);
+% thetaRefs = smooth(route(:,1),thetaRef);
+% 
+% psi_o = thetaRefs(2)*(pi/180);
+% 
+% refpos = [route,thetaRefs];
+
+%%
 
 %%%
 % route=start;
