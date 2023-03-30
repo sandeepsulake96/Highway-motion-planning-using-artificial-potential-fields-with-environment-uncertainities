@@ -38,7 +38,8 @@ x_obs3 = 600;
 y_obs3 = 5.5;
 
 v=0;
-v_obs =2;
+v_x =2;
+v_y= 0;
 dt=1;
 
 
@@ -69,15 +70,19 @@ i=1;
 while final_route(end,1)< x_tar
 
 
-    x_obs1(i+1)= x_obs1(i)+v_obs*dt; %only  longitudinal distance change
-    x_obs2(i+1)= x_obs2(i)+v_obs*dt; %only  longitudinal distance change
-    x_obs3(i+1)= x_obs3(i)+v_obs*dt; %only  longitudinal distance change
+    x_obs1(i+1)= x_obs1(i)+v_x*dt; %only  longitudinal distance change
+    x_obs2(i+1)= x_obs2(i)+v_x*dt; %only  longitudinal distance change
+    x_obs3(i+1)= x_obs3(i)+v_x*dt; %only  longitudinal distance change
+
+    y_obs1(i+1)= y_obs1(i)+v_y*dt; %only  longitudinal distance change
+    y_obs2(i+1)= y_obs2(i)+v_y*dt; %only  longitudinal distance change
+    y_obs3(i+1)= y_obs3(i)+v_y*dt; %only  longitudinal distance change
     %y_obs1(i+1)= y_obs1(i)-0.04*dt;
 
     %eq 4 (obstacle potential)
-    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
-    f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)));
-    f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3).^2)./sy^2)));
+    f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1(i)).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
+    f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2(i)).^2)./sy^2)));
+    f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3(i)).^2)./sy^2)));
 
 
 
@@ -146,9 +151,9 @@ for i=1:length(x_obs1)
     hold on
     h1=plot(x_obs1(i),y_obs1(i),'r.','LineWidth', 2, 'MarkerSize', 20);
     hold on
-    h2= plot(x_obs2(i),y_obs2,'r.','LineWidth', 2, 'MarkerSize', 20);
+    h2= plot(x_obs2(i),y_obs2(i),'r.','LineWidth', 2, 'MarkerSize', 20);
     hold on
-    h3= plot(x_obs3(i),y_obs3,'r.','LineWidth', 2, 'MarkerSize', 20);
+    h3= plot(x_obs3(i),y_obs3(i),'r.','LineWidth', 2, 'MarkerSize', 20);
     pause(0.1)
     F(i) = getframe(gcf);
     delete(h1);
@@ -157,6 +162,28 @@ for i=1:length(x_obs1)
 
 end
 
+
+%% ego and obstacle path plot
+
+figure(5)
+%contour(x1,y1,fval, 'Fill', 'On');
+yline(6.7,'-','LineWidth',4)
+hold on
+yline(1.2,'-','LineWidth',4)
+
+hold on
+yline(4,'--','LineWidth',3)
+hold on
+set(gcf,'position',[x1(1),y1(1),1000,150]);
+xlim([1 1000])
+ylim([1,7]);
+plot(final_route(:,1),final_route(:,2),'b.','LineWidth', 2, 'MarkerSize', 20);
+hold on
+plot(x_obs1,y_obs1,'r.','LineWidth', 1, 'MarkerSize', 10);
+hold on
+plot(x_obs2,y_obs2,'r.','LineWidth', 1, 'MarkerSize', 10);
+hold on
+plot(x_obs3,y_obs3,'r.','LineWidth', 1, 'MarkerSize', 10);
 
 
 %%  Play movie from the recorded F data
@@ -173,7 +200,7 @@ movie(fig,F,1)
 %% writing video file
 
 
-writerObj = VideoWriter('3_obs.gif');
+writerObj = VideoWriter('3_obs_roadcenter.gif');
 writerObj.FrameRate = 10;
 open(writerObj);
 % write the frames to the video

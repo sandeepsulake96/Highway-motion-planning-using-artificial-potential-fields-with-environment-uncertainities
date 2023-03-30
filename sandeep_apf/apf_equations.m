@@ -1,18 +1,16 @@
 % road mesh
  
-% [X,Y] = meshgrid(x,y);
-% %F = zeros*X;
-% %surf(X,Y,F)
+
 syms X Y;
 
 %
 k_tar = 10;
 k_b1 = 0.7;
 k_b2 = 0.7;
-k_c = 60;  %35
+k_c = 35 ;
 si_c =1;
 k_obs= 100;
-sx=70;   %10
+sx=100;   %70
 sy= 1;   %1.4
 k1= 0.005;
 k2=0.005;
@@ -29,8 +27,8 @@ Y2=0;   %right boundary
 
 % eq 1  (edge potential)
 d1 = (Y-Y1/2); d2= Y-Y2/2;
-u_edge1 = -k_edge1*(-exp(-d1));
-u_edge2 = -k_edge2*(-exp(d2));
+u_edge1 = -k_edge1*(-exp(-d1)+1);
+u_edge2 = -k_edge2*(-exp(d2)+1);
 f1 = u_edge1+u_edge2;
 
 % eq 2 (centerline potential)
@@ -40,7 +38,7 @@ f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 %eq 3 (target potential)
 %f3 = 1/200*( (X - x_tar).^2 + (1/50)*(Y- y_tar).^2 )
 %f3 = -1000*exp(-((((X-x_tar).^2./100000)) + (((Y-y_tar).^2./100))))
-f3= -0.5*(X-x_tar);
+f3= -1.5*(X-x_tar);
 
 %eq 4 (obstacle potential)
 x_obs1 = 700;
@@ -54,14 +52,14 @@ f4 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))) %+ gamma*(
 
 f5 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)))
 % total potential
-f=   f1+f2+0*f3+f4+f5;
+f=   f1+f2+f3+f4+f5;
 
 
 % Path Planning using gradient descent
 
-start = [10,5.5];
+start = [10,2.5];
 goal = [x_tar,y_tar];
-iter = 500;
+iter = 400;
 route = grad_desc(start,goal,f,iter,3);
 
 
