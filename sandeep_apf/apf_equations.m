@@ -9,7 +9,7 @@ syms X Y;
 k_tar = 10;
 k_b1 = 0.7;
 k_b2 = 0.7;
-k_c = 35;
+k_c = 60;  %35
 si_c =1;
 k_obs= 100;
 sx=70;   %10
@@ -40,13 +40,13 @@ f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 %eq 3 (target potential)
 %f3 = 1/200*( (X - x_tar).^2 + (1/50)*(Y- y_tar).^2 )
 %f3 = -1000*exp(-((((X-x_tar).^2./100000)) + (((Y-y_tar).^2./100))))
-f3= -4*(X-x_tar);
+f3= -0.5*(X-x_tar);
 
 %eq 4 (obstacle potential)
-x_obs1 = 250;
+x_obs1 = 700;
 y_obs1 = 5.5;
 
-x_obs2 = 600;
+x_obs2 = 300;
 y_obs2 = 2.5;
 v=0;
 v_obs =5;
@@ -54,8 +54,7 @@ f4 = k_obs*exp(- ((((X-x_obs1).^2)./sx^2) + (((Y-y_obs1).^2)./sy^2))) %+ gamma*(
 
 f5 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)))
 % total potential
-f=f1+f2+f3+f4+f5;
-
+f=   f1+f2+0*f3+f4+f5;
 
 
 % Path Planning using gradient descent
@@ -67,8 +66,8 @@ route = grad_desc(start,goal,f,iter,3);
 
 
 % Plotting
-x1 = 1:2:1000;
-y1 = 1:0.5:7;
+x1 = 1:10:1000;
+y1 = 1:0.1:7;
 [xx,yy]= meshgrid(x1,y1);
 
 fval = double((subs(f,{X,Y},{xx,yy})));
