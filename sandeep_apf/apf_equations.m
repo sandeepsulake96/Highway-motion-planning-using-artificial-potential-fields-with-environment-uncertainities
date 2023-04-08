@@ -55,6 +55,8 @@ f5 = k_obs*exp(- ((((X-x_obs2).^2)./sx^2) + (((Y-y_obs2).^2)./sy^2)))
 f=   f1+f2+f3+f4+f5;
 
 
+
+
 % Path Planning using gradient descent
 
 start = [10,2.5];
@@ -81,6 +83,11 @@ plot3(route(end,1),route(end,2),route_height(end),'r*','LineWidth',5)
 
 
 
+%%plotting for obstacle potential
+f1=f4+f5
+fval1 = double((subs(f1,{X,Y},{xx,yy})));
+figure(7)
+surf(xx,yy,fval1);
 
 % 2d plot with route
 
