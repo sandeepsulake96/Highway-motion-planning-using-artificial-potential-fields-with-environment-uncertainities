@@ -1,4 +1,4 @@
-% road mesh
+ % road mesh
  
 % [X,Y] = meshgrid(x,y);
 % %F = zeros*X;
@@ -12,8 +12,8 @@ k_b1 = 0.7;
 k_b2 = 0.7;
 k_c = 35 ;
 si_c =1;
-k_obs= 100;
-sx=40;   %70
+k_obs= 70;
+sx=70;   %40,70,120
 sy= 1;   %1.4
 k1= 0.005;
 k2=0.005;
@@ -28,7 +28,7 @@ Y1=8;  %left boundary
 YC=4;   %center line
 Y2=0;   % right boundary
 
-x_obs1 = 200;
+x_obs1 = 300;
 y_obs1 = 5.5;
 
 x_obs2 = 400;
@@ -38,7 +38,7 @@ x_obs3 = 600;
 y_obs3 = 5.5;
 
 v=0;
-v_x =1.5; %obstacle x-vel
+v_x = 7; %obstacle x-vel (1.5)
 v_y= 0; %obstacle y-vel
 dt=1;
 
@@ -59,7 +59,7 @@ f2 =  k_c*exp(-(dc.^2)./ (2*si_c^2));
 f3= -4*(X-x_tar);
 
 
-start = [10,2.5];
+start = [10,5.5];
 final_route= start;
 goal = [x_tar,y_tar];
 x1 = 1:2:1000;
@@ -81,13 +81,13 @@ while final_route(end,1)< x_tar
 
     %eq 4 (obstacle potential)
     f4 = k_obs*exp(- ((((X-x_obs1(i)).^2)./sx^2) + (((Y-y_obs1(i)).^2)./sy^2))); %+ gamma*((X-x_obs1).^2./sx^2)*(k1*v+k2*(v-v_obs)));
-    f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2(i)).^2)./sy^2)));
-    f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3(i)).^2)./sy^2)));
+    %f5 = k_obs*exp(- ((((X-x_obs2(i)).^2)./sx^2) + (((Y-y_obs2(i)).^2)./sy^2)));
+    %f6 = k_obs*exp(- ((((X-x_obs3(i)).^2)./sx^2) + (((Y-y_obs3(i)).^2)./sy^2)));
 
 
 
     % total potential
-    f=f1+f2+f3+f4+f5+f6;
+    f=f1+f2+f3+f4%+f5+f6;
 
     next = grad_desc(final_route(i,:),goal,f,1,3); %grad_desc(start,goal,f,max_iter,dist_tol)
     final_route(i+1,:) = next(end,:);
@@ -103,10 +103,10 @@ while final_route(end,1)< x_tar
     hold on
     plot(x_obs1,y_obs1,'r.','LineWidth', 2, 'MarkerSize', 40)
     hold on
-    plot(x_obs2,y_obs2,'r.','LineWidth', 2, 'MarkerSize', 40)
-    hold on
-    plot(x_obs3,y_obs3,'r.','LineWidth', 2, 'MarkerSize', 40)
-    hold on
+    %plot(x_obs2,y_obs2,'r.','LineWidth', 2, 'MarkerSize', 40)
+    %hold on
+    %plot(x_obs3,y_obs3,'r.','LineWidth', 2, 'MarkerSize', 40)
+    %hold on
     set(gcf,'position',[x1(1),y1(1),1000,150])
 
     %plot3(route(1,1),route(1,2),route_height(1),'r*','LineWidth',5)
@@ -181,9 +181,9 @@ plot(final_route(:,1),final_route(:,2),'b.','LineWidth', 2, 'MarkerSize', 20);
 hold on
 plot(x_obs1,y_obs1,'r.','LineWidth', 1, 'MarkerSize', 10);
 hold on
-plot(x_obs2,y_obs2,'r.','LineWidth', 1, 'MarkerSize', 10);
+%plot(x_obs2,y_obs2,'r.','LineWidth', 1, 'MarkerSize', 10);
 hold on
-plot(x_obs3,y_obs3,'r.','LineWidth', 1, 'MarkerSize', 10);
+%plot(x_obs3,y_obs3,'r.','LineWidth', 1, 'MarkerSize', 10);
 
 
 %%  Play movie from the recorded F data
@@ -213,14 +213,69 @@ close(writerObj)
 
 
 %%
+%% Calculate reference poses for vehicle tracking and control
+ 
+%thetaRef = zeros(length(route(:,1)),1);
+
+%gradbp = linspace(0,route(end))
+xRef2= final_route(:,1);
+yRef2= final_route(:,2);
+
+speed =10; %longitudinal speed
+
+L = 3; % bicycle length
+ld = 5; % lookahead distance
+Ts = 16; % simulation time
+
+M_veh = 2000;
+
+
+sim('pure_pursuit_tracking.slx');
+% X_o = refPose(1,1); % initial vehicle position
+% Y_o = -refPose(1,2); % initial vehicle position 
+% psi_o = 0; % initial yaw angle
+
+
+figure(3)
+plot(xRef2,yRef2,'LineWidth',2)
+xlim([0 1000]);
+ylim([2 6]);
+hold on
+plot(x_track,y_track,'--g',LineWidth=2);
+
+%error plot
+
+y_track_interp = interp1(x_track,y_track,xRef2);
+
+figure(4)
+plot(xRef2,yRef2-y_track_interp,'LineWidth',2);grid on;
+xlabel('X')
+ylabel('Lateral displacement Error[m]')
 
 
 
+figure(5)
+plot(x_track,yaw,'LineWidth',2);
+xlabel('X[m]')
+ylabel('Yaw [rad]')
+grid on
 
 
 
+figure(6)
+plot(xRef2,y_obs1'-yRef2,'LineWidth',2)
+xlabel('X[m]')
+ylabel('Lateral offset between Ego and Obstacle [m]')
+grid on
 
 
+%
+figure(6)
+plot(xRef2,xRef2,'LineWidth',2)
+hold on
+plot(xRef2,x_obs1,'LineWidth',2)
+xlabel('X[m]')
+ylabel('Distance travelled[m]')
 
-
-
+legend('Ego vehicle','Obstacle vehicle')
+grid on
